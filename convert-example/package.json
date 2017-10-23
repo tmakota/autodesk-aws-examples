@@ -1,0 +1,44 @@
+{
+  "name": "forge_convert",
+  "version": "0.0.1",
+  "description": "example of converting .DWG file using AWS and Autodesk Forge API",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint -c ../.eslintrc --ignore-path ../.eslintignore .",
+    "test": "test",
+    "build": "zip -r $npm_config_parm_zip_file_name index.js createbucket.js ./lib/",
+    "cf-build": "aws cloudformation package --template template.yaml --s3-bucket $npm_config_sam_cfn_s3_bucket --output-template-file template.output.yaml",
+    "cf-deploy":"aws cloudformation deploy --template-file $(pwd)/template.output.yaml --parameter-overrides S3BucketName=\"$npm_config_parm_s3_bucket_name\" ForgeClientID=\"$npm_config_parm_forge_client_id\" ForgeClientSecret=\"$npm_config_parm_forge_secret\"  --stack-name $npm_config_stack_name --capabilities \"CAPABILITY_IAM\"",
+    "just-do-it": "npm run build && npm run cf-build && npm run cf-deploy",
+    "upload-dwg": "aws s3 cp bottom_plate.dwg  s3://$npm_config_parm_s3_bucket_name/incoming-dwg/bottom_plate.dwg",
+    "upload-dwg2": "aws s3 cp bottom_plate.dwg  s3://autodesk-tmak/incoming-dwg/bottom_plate.dwg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmakota/autodesk-aws-examples.git"
+  },
+  "keywords": [
+    "autodesk",
+    "aws",
+    "s3",
+    "lambda",
+    "serverless",
+    "forge",
+    "api"
+  ],
+  "devDependencies": {
+    "babel-eslint": "^7.1.0",
+    "eslint": "^3.12.0",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-babel": "^4.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1"
+  },
+  "author": "Tarik Makota <\"tmak@amazon.com\"> (<\"tmak@amazon.com\">)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmakota/autodesk-aws-examples/issues"
+  },
+  "homepage": "https://github.com/tmakota/autodesk-aws-examples#readme"
+}

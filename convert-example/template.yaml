@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+    Serverless application to demonstrate Autodesk Forge API and AWS services.
+
+    Last Modified: 12 Oct, 2017
+    Authors: Tarik Makota <tmak@amazon.com>
+
+Parameters:
+  S3BucketName:
+    Type: "String"
+    Description: "Please enter S3 Bucket name to create - these MUST BE globally unique"
+
+  ForgeClientID:
+    Type: "String"
+    Description: "Forge API Client ID (this will not be shown, but used as parameter)"
+  
+  ForgeClientSecret:
+    Type: "String"
+    Description: "Forge API Client Secret (this will not be shown, but used as parameter)"
+
+  S3Prefix:
+    Type: "String"
+    Description: "Enter an optional prefix to limit the notifications to objects with keys that start with matching characters. e.g. uploadedImages/"
+    Default: "incoming-dwg/"
+
+  S3Suffix:
+    Type: "String"
+    Description: "Enter an optional suffix to limit the notifications to objects with keys that end with matching characters.. e.g. .jpge"
+    Default: "dwg"
+    
+Outputs:
+    SplunkALBLogsProcessor:
+      Description: "Splunk S3 Bucket Stream Lambda Function ARN"
+      Value: !Ref FileProcessorLambda
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: BucketOwnerFullControl
+      NotificationConfiguration:
+        LambdaConfigurations:
+        - Event: "s3:ObjectCreated:Put"
+          Function: !GetAtt FileProcessorLambda.Arn
+          Filter:
+              S3Key:
+                Rules:
+                  -
+                    Name: prefix
+                    Value: !Ref S3Prefix
+                  -
+                    Name: suffix
+                    Value: !Ref S3Suffix
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: {Service: [lambda.amazonaws.com]}
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+      - PolicyName: S3Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:PutObject'
+                - 's3:GetObject'
+                - 's3:DeleteObject'
+              Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+
+  
+
+  S3BucketPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref FileProcessorLambda
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: !Sub "arn:aws:s3:::${S3BucketName}"
+      
+
+  FileProcessorLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Stream ALB events from S3 to Lambda Function
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: ./aws-adsk-convert-example.zip
+      Role: !GetAtt LambdaExecutionRole.Arn
+      MemorySize: 512
+      Timeout: 10
+      Environment:
+        Variables:
+          FORGE_CLIENT_SECRET: !Ref ForgeClientSecret
+          FORGE_CLIENT_ID: !Ref ForgeClientID
+          S3_BUCKET_NAME: !Ref S3BucketName
+      
+      
