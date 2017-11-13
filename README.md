@@ -3,7 +3,6 @@ Examples of usage of Autodesk and AWS
 
 ## You will need:
 - AWS CLI (https://aws.amazon.com/cli)
-- Your favorite Code Editor/IDE (ive used Visual Source Code)
 - AWS Account ('tis free: https://aws.amazon.com)
 - Autodesk Developer Account (https://developer.autodesk.com/)
 - Forge Module/Application 
