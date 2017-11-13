@@ -5,20 +5,17 @@ Examples of usage of Autodesk and AWS
 - AWS CLI (https://aws.amazon.com/cli)
 - Your favorite Code Editor/IDE (ive used Visual Source Code)
 - AWS Account ('tis free: https://aws.amazon.com)
+- Autodesk Developer Account (https://developer.autodesk.com/)
+- Forge Module/Application 
 
 Each Example App might have its own config, please read/follow the instructions associatted with example.
 
 In this lab, you will lear how to convert Autodesk DWG file into PDF using AWS Services and Forge API. 
 AWS services used are 
-Simple Storage Service (S3)
-Identity and Access Management (IAM) 
-Simple Notification Service (SNS) and 
-AWS Lambda (Serverless Functions)
-
-## Requirement:
-- AWS Account (its free if you dont have one ) https://aws.amazon.com
-- AWS CLI (installed and configured) 
-- Autodesk Developer Account
+* Simple Storage Service (S3)
+* Identity and Access Management (IAM) 
+* Simple Notification Service (SNS) and 
+* AWS Lambda (Serverless Functions)
 
 ## Here is flow of our application:
 1.	Upload .dwg file to S3 bucket. We will use AWS CLI for the demo.
@@ -30,13 +27,13 @@ AWS Lambda (Serverless Functions)
 7.	AWS SNS will send email to subscribed users
 
 ## S3 – Create Bucket and Folders
-Login into your AWS Console and create new S3 bucket called autodesk-####. (replace ####)
+Login into your AWS Console and create new S3 bucket called autodesk-**####**. (replace ####)
 Bucket names must be unique globally, so you may need to come up with creative replacement for #### in autodesk-#####.
-Important: Create S3 bucket in region closest to you. Lambda function will need to reside in same region. 
+**_Important: Create S3 bucket in region closest to you. Lambda function will need to reside in same region._**
 
 Once S3 Bucket is created create two folders in that bucket
-incoming-dwg
-converted-pdf
+* incoming-dwg
+* converted-pdf
 
 For this conversion exercise, we will use Autodesk sample DWG file which you can download from here:
 https://www.dropbox.com/s/kbpbuwpknuh6ukn/Bottom_plate.dwg?dl=0 
@@ -45,7 +42,7 @@ Download file on your local PC/Mac. Later on, we will use AWS CLI to upload the 
 
 ## Lambda Function 
 Create Lambda and IAM role
-IMPORTANT: Switch to Region in which you created S3 bucket before you create Lambda function
+**_IMPORTANT: Switch to Region in which you created S3 bucket before you create Lambda function_**
 
 Create Lambda function from scratch
 
