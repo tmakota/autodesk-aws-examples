@@ -38,10 +38,10 @@ Once S3 Bucket is created create two folders in that bucket
 incoming-dwg
 converted-pdf
 
-For this conversion exercise, we will use Autodesk sample DWG 
-file which you can download from here: https://www.dropbox.com/s/kbpbuwpknuh6ukn/Bottom_plate.dwg?dl=0 
-Download file on your local PC/Mac.  
-Later on, we will use AWS CLI to upload the files from local PC to Amazon S3 incoming-dwg folder  
+For this conversion exercise, we will use Autodesk sample DWG file which you can download from here:
+https://www.dropbox.com/s/kbpbuwpknuh6ukn/Bottom_plate.dwg?dl=0 
+
+Download file on your local PC/Mac. Later on, we will use AWS CLI to upload the files from local PC to Amazon S3 incoming-dwg folder  
 
 ## Lambda Function 
 Create Lambda and IAM role
@@ -331,4 +331,12 @@ Copy Policy from below for your topic.
 }
 ```
 
+## Create S3 Event Trigger when Forge uploads PDF
+Once Forge Design Automation API, formerly known as the “AutoCAD I/O API”, creates PDF it will upload that PDF in the S3 converted-pdf folder 
+* Name: SMSWhenPDFIsReady
+* Even(s): PUT
+* Prefix: converted-pdf/
+* Suffix: .pdf
+* Send To: SNS Topic
+SNS: : one you just created < >
 
