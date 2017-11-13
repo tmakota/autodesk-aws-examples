@@ -290,7 +290,7 @@ Set values as following:
 
 ## Create SNS topic & Subscribe to it
 In your AWS Console navigate To Simple Notification Service (SNS), click on Create Topic.
-*Topic Name: PDFConvertTopic
+* Topic Name: PDFConvertTopic
 * Display Name: ADSK PDF
 
 Click Create Subscription.
@@ -344,5 +344,30 @@ Once Forge Design Automation API, formerly known as the “AutoCAD I/O API”, c
 * Prefix: converted-pdf/
 * Suffix: .pdf
 * Send To: SNS Topic
-SNS: : one you just created < >
+SNS: : one you just created <PDFConvertTopic >
+	
+## Let’s Test it out
+We will upload dwg file using AWS CLI 
+
+Open your favorite terminal and navigate to folder where you saved Bottom_plate.dwg 
+If you forgot to do so Fsample DWG file which you can download from here:
+
+https://www.dropbox.com/s/kbpbuwpknuh6ukn/Bottom_plate.dwg?dl=0 
+
+```
+aws s3 Bottom_plate.dwg s3://autodesk-####bucket/Bottom_plate.dwg
+```
+
+Output:
+```
+upload: Bottom_plate.dwg to s3://autodesk-####bucket/Bottom_plate.dwg
+```
+
+If it all worked you should have converted PDF file in S3 bucket.
+
+Using AWS Console navigate to your S3 bucket and check if incoming-pdf folder contains PDF.
+
+## Whats Comming
+In following labs we will replace CLI with thin client such as AngularJS or React Application or even Autocad application itself.Stay tuned
+
 
