@@ -9,7 +9,7 @@ Examples of usage of Autodesk and AWS
 
 Each Example App might have its own config, please read/follow the instructions associatted with example.
 
-In this lab, you will lear how to convert Autodesk DWG file into PDF using AWS Services and Forge API. 
+In this lab, you will learn how to convert Autodesk DWG file into PDF using AWS Services and Forge API. 
 AWS services used are 
 * Simple Storage Service (S3)
 * Identity and Access Management (IAM) 
