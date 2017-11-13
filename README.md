@@ -29,6 +29,7 @@ AWS services used are
 ## S3 – Create Bucket and Folders
 Login into your AWS Console and create new S3 bucket called autodesk-**####**. (replace ####)
 Bucket names must be unique globally, so you may need to come up with creative replacement for #### in autodesk-#####.
+
 **_Important: Create S3 bucket in region closest to you. Lambda function will need to reside in same region._**
 
 Once S3 Bucket is created create two folders in that bucket
@@ -42,13 +43,16 @@ Download file on your local PC/Mac. Later on, we will use AWS CLI to upload the 
 
 ## Lambda Function 
 Create Lambda and IAM role
+
 **_IMPORTANT: Switch to Region in which you created S3 bucket before you create Lambda function_**
 
 Create Lambda function from scratch
 
 Name: njsConvertDgwToPdf
+
 Role: Create Custom Role , your policy document needs to look like one below
-```
+
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -81,7 +85,7 @@ Role: Create Custom Role , your policy document needs to look like one below
 ```
 
 Click Create Function. This will create Lambda function, replace code with below
-```
+```javascript
 'use strict';
 
 const aws = require('aws-sdk');
@@ -117,12 +121,12 @@ const authReq = {
 const bb = {
     Arguments: {
         InputArguments: [{
-            Resource: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/incoming-dwg/Bottom_plate.dwg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAIZZYUXUXF3ESMELQ%2F20171009%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20171009T204214Z&X-Amz-Expires=1200&X-Amz-Security-Token=FQoDYXdzEK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDK83zzNijB%2FEx39NDyLrAbqwU8UEG0od4LJ65sNOZ9tnO3br8Fnr0yiu3ftFRuPNxkiZq7lI53A22YiAnI75GibMuD5qo5uzFlBWDJ8T0dOTD%2BjT6sXWsRZP4%2Fg4G8XqQk68WvbAMr8v0lJmKKEzH4%2FwmhWcvp7g50Lt7ZV2vN10VZHvyCo4mSQu4rDCOAPpM6Q0fN%2BuS8b4sZrubGHf6pA21MfbHmq%2FjxlOutjK7A37cEgkctValbPlhkpLrcJsow6RcyGJY1otYcHOo3McOph16S2hAV%2FKx6iNaVhTJrKLhI3reMqe2SWod%2FCofGHJWRrZPb0yiLc6Ylso6ZjvzgU%3D&X-Amz-Signature=8a326f559b910467414de6885f372bdcd95a466f09d559e7113e329bf19d906a&X-Amz-SignedHeaders=host`,
+            Resource: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com`,
             Name: 'HostDwg' }],
 	    OutputArguments: [{
             Name: 'Result',
             HttpVerb: 'PUT',
-            Resource: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/converted-pdf/result.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAIZZYUXUXF3ESMELQ%2F20171009%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20171009T204214Z&X-Amz-Expires=1200&X-Amz-Security-Token=FQoDYXdzEK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDK83zzNijB%2FEx39NDyLrAbqwU8UEG0od4LJ65sNOZ9tnO3br8Fnr0yiu3ftFRuPNxkiZq7lI53A22YiAnI75GibMuD5qo5uzFlBWDJ8T0dOTD%2BjT6sXWsRZP4%2Fg4G8XqQk68WvbAMr8v0lJmKKEzH4%2FwmhWcvp7g50Lt7ZV2vN10VZHvyCo4mSQu4rDCOAPpM6Q0fN%2BuS8b4sZrubGHf6pA21MfbHmq%2FjxlOutjK7A37cEgkctValbPlhkpLrcJsow6RcyGJY1otYcHOo3McOph16S2hAV%2FKx6iNaVhTJrKLhI3reMqe2SWod%2FCofGHJWRrZPb0yiLc6Ylso6ZjvzgU%3D&X-Amz-Signature=3f36fceefc269673b1a22aead3aade10a881269ca714e42db2ae75edb19565dc&X-Amz-SignedHeaders=host`,
+            Resource: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com`,
             StorageProvider: 'Generic' } ] },
     ActivityId: 'PlotToPDF',
     Id: '' };
@@ -265,37 +269,42 @@ exports.handler = (event, context, callback) => {
 ```
 
 For Your Lambda Function you'll need to create 2 Environment variable.
-FORGE_CLIENT_SECRET
-FORGE_CLIENT_ID
+
+**FORGE_CLIENT_SECRET** << your Forge Application Secret
+
+**FORGE_CLIENT_ID** << your Forge Client ID
+
 set the values according to your Forge Application/module values 
 
 Change execution time for Lambda function from 3 sec to 30 secs
 
 ## S3 Bucket Lambda Trigger
-When DWG file is deposited in S3 bucket we want to trigger a Lambda function to process 
-the file 
-Using AWS Console navigate to your autodesk-#### bucket. Under Properties tab click on Events block. Click on Add Notification button.
+When DWG file is deposited in S3 bucket we want to trigger a Lambda function to process the file. Using AWS Console navigate to your autodesk-**####** bucket. Under Properties tab click on Events block. Click on Add Notification button.
 Set values as following:
-Name: TriggerLambdaFunction
-Even(s): PUT
-Prefix: incoming-dwg/
-Suffix: .dwg
-Send To: Lambda Function
-Lambda: one you just created < njsConvertDgwToPdf>
+* Name: TriggerLambdaFunction
+* Even(s): PUT
+* Prefix: incoming-dwg/
+* Suffix: .dwg
+* Send To: Lambda Function
+* Lambda: one you just created < njsConvertDgwToPdf>
 
 ## Create SNS topic & Subscribe to it
 In your AWS Console navigate To Simple Notification Service (SNS), click on Create Topic.
-Topic Name: PDFConvertTopic
-Display Name: ADSK PDF
+*Topic Name: PDFConvertTopic
+* Display Name: ADSK PDF
 
 Click Create Subscription.
+
 From Protocol dropdown select Email and enter your email address in the Endpoint field.
-Note: You will receive email to acknowledge subscription, make sure you do so. 
+
+**_Note: You will receive email to acknowledge subscription, make sure you do so._**
 
 Once Topic is created edit its policy to enable S3 to publish events to it.
+
 Click on Other Topic Actions and select Edit Topic Policy from dropdown. 
+
 Copy Policy from below for your topic.
-```
+```json
 {
   "Version": "2008-10-17",
   "Id": "__default_policy_ID",
