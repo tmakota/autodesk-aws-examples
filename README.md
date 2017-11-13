@@ -1,4 +1,4 @@
-# autodesk-aws-examples - DWG File Conversion workshop
+# DWG File Conversion workshop
 Examples of usage of Autodesk and AWS
 
 ## You will need:
