@@ -1,0 +1,6 @@
+sam_cfn_s3_bucket = FAKE-BUCKET
+stack_name = FAKENAME
+parm_zip_file_name = aws-adsk-convert-example.zip
+parm_s3_bucket_name = adsk-aws-convert-example
+parm_forge_secret = parm_forge_secret
+parm_forge_client_id = CLIENTID
